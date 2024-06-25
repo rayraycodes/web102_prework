@@ -32,17 +32,17 @@ function addGamesToPage(games) {
     for (let game of games) {
         // create a new div element, which will become the game card
         let gameCard = document.createElement('div');
-    
+
         // add the class game-card to the list
         gameCard.classList.add('game-card');
-    
+
         // set the inner HTML using a template literal to display some info about each game
         gameCard.innerHTML = `
         <img src="${game.img}" class="game-img" />
         <h2>${game.name}</h2>
         <p>${game.description}</p>
         `;
-    
+
         // append the game to the games-container
         document.getElementById('games-container').appendChild(gameCard);
     }
@@ -99,7 +99,6 @@ gamesCard.innerHTML = `${GAMES_JSON.length}`;
 
 // grab the description container
 const descriptionContainer = document.getElementById("description-container");
-
 // show only games that do not yet have enough funding
 function filterUnfundedOnly() {
     deleteChildElements(gamesContainer);
@@ -109,6 +108,12 @@ function filterUnfundedOnly() {
 
     // use the function we previously created to add the unfunded games to the DOM
     addGamesToPage(unfundedGames);
+    this.classList.add('active');
+    fundedBtn.classList.remove('active');
+    allBtn.classList.remove('active');
+
+    // change the game status text
+    document.getElementById("game-status").innerHTML = "(Unfunded)";
 }
 
 // show only games that are fully funded
@@ -120,6 +125,12 @@ function filterFundedOnly() {
 
     // use the function we previously created to add the funded games to the DOM
     addGamesToPage(fundedGames);
+    this.classList.add('active');
+    unfundedBtn.classList.remove('active');
+    allBtn.classList.remove('active');
+
+    // change the game status text
+    document.getElementById("game-status").innerHTML = "(Funded)";
 }
 
 // show all games
@@ -128,6 +139,13 @@ function showAllGames() {
 
     // add all games from the JSON data to the DOM
     addGamesToPage(GAMES_JSON);
+
+    this.classList.add('active');
+    fundedBtn.classList.remove('active');
+    unfundedBtn.classList.remove('active');
+
+    // change the game status text
+    document.getElementById("game-status").innerHTML = "(All)";
 }
 
 // select each button in the "Our Games" section
@@ -150,7 +168,7 @@ let totalPledged = GAMES_JSON.reduce((total, game) => total + game.pledged, 0);
 let totalGames = GAMES_JSON.length;
 
 // create a string that explains the number of unfunded games using the ternary operator
-let unfundedGamesText = `A total of $${totalPledged.toLocaleString()} has been raised for ${totalGames} games. Currently, ${unfundedGamesCount} game${unfundedGamesCount !== 1 ? 's' : ''} remain unfunded. We need your help to fund these amazing games!`;
+let unfundedGamesText = `A total of $${totalPledged.toLocaleString()} has been raised for ${totalGames} games. Currently, ${unfundedGamesCount} game${unfundedGamesCount !== 1 ? 's' : ''} remain unfunded. We need your help to fund these amazing games! Following is our stats until today:`;
 
 // create a new DOM element containing the template string
 let unfundedGamesElement = document.createElement('p');
@@ -167,7 +185,7 @@ descriptionContainer.appendChild(unfundedGamesElement);
 const firstGameContainer = document.getElementById("first-game");
 const secondGameContainer = document.getElementById("second-game");
 
-const sortedGames =  GAMES_JSON.sort( (item1, item2) => {
+const sortedGames = GAMES_JSON.sort((item1, item2) => {
     return item2.pledged - item1.pledged;
 });
 
@@ -184,8 +202,7 @@ let secondGameElement = document.createElement('p');
 secondGameElement.textContent = secondGame.name;
 secondGameContainer.appendChild(secondGameElement);
 
-// Show all games by default
-addGamesToPage(GAMES_JSON);
+
 
 // adding search functionality
 const searchBar = document.getElementById('search-bar');
@@ -195,12 +212,14 @@ searchBar.addEventListener('input', (event) => {
     deleteChildElements(gamesContainer);
     const searchQuery = event.target.value.toLowerCase();
     const filteredGames = GAMES_JSON.filter(game => game.name.toLowerCase().includes(searchQuery));
-  
+    if (filteredGames.length === 0) {
+        gamesContainer.innerHTML = '<p class="no-games">No games with that name found</p>';
+    }
     // Use addGamesToPage function with filteredGames
     addGamesToPage(filteredGames);
-  });
+});
 
-// animating
+// animating all elements
 
 function animateFadeIn(element) {
     element.animate([
@@ -220,6 +239,11 @@ function animateFadeIn(element) {
 const allElements = document.body.getElementsByTagName('*');
 
 // Animate each element
+let delay = 0;
 for (let element of allElements) {
-    animateFadeIn(element);
+    setTimeout(() => animateFadeIn(element), delay);
+    delay += 5; 
 }
+
+// Show all games by default
+showAllGames();
