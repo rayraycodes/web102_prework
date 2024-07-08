@@ -114,6 +114,7 @@ function filterUnfundedOnly() {
 
     // change the game status text
     document.getElementById("game-status").innerHTML = "(Unfunded)";
+    document.getElementById('search-bar').value = '';
 }
 
 // show only games that are fully funded
@@ -131,6 +132,8 @@ function filterFundedOnly() {
 
     // change the game status text
     document.getElementById("game-status").innerHTML = "(Funded)";
+    document.getElementById('search-bar').value = '';
+
 }
 
 // show all games
@@ -146,6 +149,8 @@ function showAllGames() {
 
     // change the game status text
     document.getElementById("game-status").innerHTML = "(All)";
+    document.getElementById('search-bar').value = '';
+
 }
 
 // select each button in the "Our Games" section
@@ -208,15 +213,31 @@ secondGameContainer.appendChild(secondGameElement);
 const searchBar = document.getElementById('search-bar');
 
 searchBar.addEventListener('input', (event) => {
+    const searchQuery = event.target.value.toLowerCase();
+    let filteredGames;
+    const buttonContainer = document.getElementById('button-container');
+    const buttons = buttonContainer.querySelectorAll('button');
+    buttons.forEach(button => {
+        button.className = "";
+    });
+    // If searchQuery is empty, set filteredGames to all games and change game status to "All"
+    if (searchQuery === "") {
+        filteredGames = GAMES_JSON;
+        document.getElementById("game-status").innerHTML = "(All Games)";
+    } else {
+        // If searchQuery is not empty, filter games and change game status to "Search Results"
+        filteredGames = GAMES_JSON.filter(game => game.name.toLowerCase().includes(searchQuery));
+        document.getElementById("game-status").innerHTML = "(Search Results)";
+    }
 
     deleteChildElements(gamesContainer);
-    const searchQuery = event.target.value.toLowerCase();
-    const filteredGames = GAMES_JSON.filter(game => game.name.toLowerCase().includes(searchQuery));
+
     if (filteredGames.length === 0) {
         gamesContainer.innerHTML = '<p class="no-games">No games with that name found</p>';
+    } else {
+        // Use addGamesToPage function with filteredGames
+        addGamesToPage(filteredGames);
     }
-    // Use addGamesToPage function with filteredGames
-    addGamesToPage(filteredGames);
 });
 
 // animating all elements
