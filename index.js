@@ -267,4 +267,4 @@ for (let element of allElements) {
 }
 
 // Show all games by default
-// showAllGames();
+filterFundedOnly();
